@@ -179,7 +179,7 @@ type Import struct {
 	Status   filestore.Status
 	Key      cid.Cid
 	FilePath string
-	Size     uint64
+	Size     abi.UnpaddedPieceSize
 }
 
 type DealInfo struct {

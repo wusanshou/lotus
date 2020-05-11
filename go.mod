@@ -22,7 +22,7 @@ require (
 	github.com/filecoin-project/go-crypto v0.0.0-20191218222705-effae4ea9f03
 	github.com/filecoin-project/go-data-transfer v0.3.0
 	github.com/filecoin-project/go-fil-commcid v0.0.0-20200208005934-2b8bd03caca5
-	github.com/filecoin-project/go-fil-markets v0.2.2
+	github.com/filecoin-project/go-fil-markets v0.2.3-0.20200509150932-aab2d5b474f7
 	github.com/filecoin-project/go-padreader v0.0.0-20200210211231-548257017ca6
 	github.com/filecoin-project/go-paramfetch v0.0.2-0.20200505180321-973f8949ea8e
 	github.com/filecoin-project/go-statestore v0.1.0
@@ -41,7 +41,6 @@ require (
 	github.com/ipfs/go-bitswap v0.2.8
 	github.com/ipfs/go-block-format v0.0.2
 	github.com/ipfs/go-blockservice v0.1.3
-	github.com/ipfs/go-car v0.0.3-0.20200121013634-f188c0e24291
 	github.com/ipfs/go-cid v0.0.6-0.20200501230655-7c82f3b81c00
 	github.com/ipfs/go-datastore v0.4.4
 	github.com/ipfs/go-ds-badger2 v0.1.0

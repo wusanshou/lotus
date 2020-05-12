@@ -15,9 +15,9 @@ func init() {
 var SectorSizes = []abi.SectorSize{2048}
 
 // Seconds
-const BlockDelay = 2
+const BlockDelay = 25
 
-const PropagationDelay = 3
+const PropagationDelay = 6
 
 // SlashablePowerDelay is the number of epochs after ElectionPeriodStart, after
 // which the miner is slashed

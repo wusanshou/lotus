@@ -11,7 +11,7 @@ require (
 	github.com/StackExchange/wmi v0.0.0-20190523213315-cbe66965904d // indirect
 	github.com/coreos/go-systemd/v22 v22.0.0
 	github.com/docker/go-units v0.4.0
-	github.com/drand/drand v0.8.2-0.20200518165838-d61135e6e2c8
+	github.com/drand/drand v0.9.2-0.20200522121306-8d7e99a830a7
 	github.com/fatih/color v1.8.0
 	github.com/filecoin-project/chain-validation v0.0.6-0.20200518190139-483332336e8e
 	github.com/filecoin-project/filecoin-ffi v0.0.0-20200427223233-a0014b17f124

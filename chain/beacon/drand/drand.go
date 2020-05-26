@@ -6,6 +6,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/drand/kyber"
 	"github.com/filecoin-project/lotus/build"
 	"github.com/filecoin-project/lotus/chain/beacon"
 	"github.com/filecoin-project/lotus/chain/types"
@@ -14,10 +15,8 @@ import (
 
 	logging "github.com/ipfs/go-log"
 
-	dbeacon "github.com/drand/drand/beacon"
+	dchain "github.com/drand/drand/chain"
 	dclient "github.com/drand/drand/client"
-	dkey "github.com/drand/drand/key"
-	dproto "github.com/drand/drand/protobuf/drand"
 )
 
 var log = logging.Logger("drand")
@@ -27,17 +26,12 @@ var drandServers = []string{
 	"https://dev2.drand.sh",
 }
 
-var drandGroup *dkey.Group
+var drandChain dchain.Info
 
 func init() {
-	var protoGroup dproto.GroupPacket
-	err := json.Unmarshal([]byte(build.DrandGroup), &protoGroup)
+	err := json.Unmarshal([]byte(build.DrandChain), &drandChain)
 	if err != nil {
 		panic("could not unmarshal group info: " + err.Error())
-	}
-	drandGroup, err = dkey.GroupFromProto(&protoGroup)
-	if err != nil {
-		panic("could not convert from proto to key group: " + err.Error())
 	}
 }
 
@@ -57,7 +51,7 @@ func (dp *drandPeer) IsTLS() bool {
 type DrandBeacon struct {
 	client dclient.Client
 
-	pubkey *dkey.DistPublic
+	pubkey kyber.Point
 
 	// seconds
 	interval time.Duration
@@ -76,7 +70,7 @@ func NewDrandBeacon(genesisTs, interval uint64) (*DrandBeacon, error) {
 	}
 	client, err := dclient.New(
 		dclient.WithHTTPEndpoints(drandServers),
-		dclient.WithGroup(drandGroup),
+		dclient.WithChainInfo(&drandChain),
 		dclient.WithCacheSize(1024),
 	)
 	if err != nil {
@@ -88,9 +82,9 @@ func NewDrandBeacon(genesisTs, interval uint64) (*DrandBeacon, error) {
 		localCache: make(map[uint64]types.BeaconEntry),
 	}
 
-	db.pubkey = drandGroup.PublicKey
-	db.interval = drandGroup.Period
-	db.drandGenTime = uint64(drandGroup.GenesisTime)
+	db.pubkey = drandChain.PublicKey
+	db.interval = drandChain.Period
+	db.drandGenTime = uint64(drandChain.GenesisTime)
 	db.filRoundTime = interval
 	db.filGenTime = genesisTs
 
@@ -117,7 +111,7 @@ func (db *DrandBeacon) Entry(ctx context.Context, round uint64) <-chan beacon.Re
 			br.Err = xerrors.Errorf("drand failed Get request: %w", err)
 		} else {
 			br.Entry.Round = resp.Round()
-			br.Entry.Data = resp.(*dclient.RandomData).Signature
+			br.Entry.Data = resp.Signature()
 		}
 
 		out <- br
@@ -147,12 +141,12 @@ func (db *DrandBeacon) VerifyEntry(curr types.BeaconEntry, prev types.BeaconEntr
 		// TODO handle genesis better
 		return nil
 	}
-	b := &dbeacon.Beacon{
+	b := &dchain.Beacon{
 		PreviousSig: prev.Data,
 		Round:       curr.Round,
 		Signature:   curr.Data,
 	}
-	err := dbeacon.VerifyBeacon(db.pubkey.Key(), b)
+	err := dchain.VerifyBeacon(db.pubkey, b)
 	if err == nil {
 		db.cacheValue(curr)
 	}
